@@ -172,6 +172,9 @@ print_success "Installed: shell-quote"
 npm install @iden3/js-iden3-auth 2>&1
 print_success "Installed: @iden3/js-iden3-auth"
 
+npm install ethers@6 2>&1
+print_success "Installed: ethers v6 (required for SigningKey support)"
+
 print_success "All dependencies installed."
 
 # ============================================================
