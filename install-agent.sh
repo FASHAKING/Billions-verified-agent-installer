@@ -175,6 +175,9 @@ print_success "Installed: @iden3/js-iden3-auth"
 npm install ethers@6 2>&1
 print_success "Installed: ethers v6 (required for SigningKey support)"
 
+npm install uuid 2>&1
+print_success "Installed: uuid (required for message ID generation)"
+
 print_success "All dependencies installed."
 
 # ============================================================
