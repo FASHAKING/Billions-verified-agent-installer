@@ -1,26 +1,60 @@
-# Verified Agent Identity — Termux Setup Guide
+# Verified Agent Identity — Setup Guide
 
-## ⚡ One-Command Install
+Choose your platform below and run the one-command installer.
 
-Open Termux on your Android phone and paste this single command:
+---
+
+## Termux (Android)
+
+Open **Termux** on your Android phone and paste:
 
 ```bash
 curl -sL https://raw.githubusercontent.com/FASHAKING/Billions-verified-agent-installer/main/install-agent.sh | bash
 ```
 
-That's it! The script will:
-- Update your Termux packages
-- Install Node.js and Git
-- Clone the repository
-- Install all dependencies (including common missing ones)
-- Prompt you for your **Agent Name** and **Description**
-- Create your Agent Ethereum Identity
-- Link your Human Identity with your Agent
-- Give you a verification URL to complete in your browser
+---
+
+## Windows (PowerShell / Windows Terminal)
+
+Open **PowerShell** or **Windows Terminal** and paste:
+
+```powershell
+irm https://raw.githubusercontent.com/FASHAKING/Billions-verified-agent-installer/main/install-agent-windows.ps1 | iex
+```
+
+> **Requirements:** Windows 10/11 with PowerShell 5.1+. The script will auto-install Node.js and Git via `winget` if they are missing.
 
 ---
 
-## 🔧 Manual Step-by-Step (if you prefer)
+## GitHub Codespaces / Workspaces / Gitpod / WSL
+
+Open a terminal in your **Codespace**, **Workspace**, **Gitpod**, or **WSL** and paste:
+
+```bash
+curl -sL https://raw.githubusercontent.com/FASHAKING/Billions-verified-agent-installer/main/install-agent-codespaces.sh | bash
+```
+
+> Works on any Ubuntu/Debian-based Linux environment. Also supports Fedora, CentOS, and Alpine.
+
+---
+
+## What the installers do
+
+Each installer follows the same steps:
+
+1. Installs **Node.js** and **Git** (if not already present)
+2. Clones the [verified-agent-identity](https://github.com/BillionsNetwork/verified-agent-identity) repository
+3. Installs all dependencies via `clawhub` (plus common missing modules)
+4. Creates your **Agent Ethereum Identity**
+5. Links your **Human Identity** with your Agent
+6. Gives you a **verification URL** to complete in your browser
+
+---
+
+## Manual Step-by-Step (Termux)
+
+<details>
+<summary>Click to expand manual Termux instructions</summary>
 
 ### Step 1 — Update Termux
 ```bash
@@ -57,29 +91,76 @@ node scripts/manualLinkHumanToAgent.js --challenge '{"name":"YourAgentName","des
 ```
 Replace `YourAgentName` with your desired agent name.
 
-After running this, you'll get a **verification URL** in the terminal.  
+After running this, you'll get a **verification URL** in the terminal.
 Copy it → open in browser → connect wallet → verify. Done!
+
+</details>
 
 ---
 
-## 🛠 Common Error Fixes
+## Manual Step-by-Step (Windows)
+
+<details>
+<summary>Click to expand manual Windows instructions</summary>
+
+### Step 1 — Install Node.js
+Download and install from [nodejs.org](https://nodejs.org) or run:
+```powershell
+winget install OpenJS.NodeJS.LTS
+```
+
+### Step 2 — Install Git
+Download and install from [git-scm.com](https://git-scm.com) or run:
+```powershell
+winget install Git.Git
+```
+
+### Step 3 — Clone the Repository
+```powershell
+git clone https://github.com/BillionsNetwork/verified-agent-identity
+cd verified-agent-identity
+```
+
+### Step 4 — Install Dependencies
+```powershell
+npx clawhub@latest install verified-agent-identity
+```
+
+### Step 5 — Install Common Missing Modules
+```powershell
+npm install shell-quote @iden3/js-iden3-auth ethers@6 uuid
+```
+
+### Step 6 — Create Agent Ethereum Identity
+```powershell
+node scripts/createNewEthereumIdentity.js
+```
+
+### Step 7 — Link Human Identity with Agent
+```powershell
+node scripts/manualLinkHumanToAgent.js --challenge '{"name":"YourAgentName","description":"AI agent"}'
+```
+
+</details>
+
+---
+
+## Common Error Fixes
 
 ### Error: Cannot find module 'shell-quote'
 ```bash
 npm install shell-quote
 ```
-Then re-run the command from Step 5.
 
 ### Error: Cannot find module '@iden3/js-iden3-auth'
 ```bash
 npm install @iden3/js-iden3-auth
 ```
-Then re-run the command from Step 6.
 
-> **Note:** The one-command installer pre-installs both of these modules automatically, so you shouldn't hit these errors if you use it.
+> **Note:** The one-command installers pre-install these modules automatically.
 
 ---
 
-## ❓ Need Help?
+## Need Help?
 
 If you get stuck, feel free to open an issue or ask in the community.
