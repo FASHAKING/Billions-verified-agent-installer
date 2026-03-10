@@ -15,6 +15,9 @@
 
 $ErrorActionPreference = "Stop"
 
+# --- Ensure scripts like npm.ps1 can run in this session ---
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
 # --- Colors via ANSI escape codes (Windows Terminal supports these) ---
 function Write-Banner {
     Write-Host ""
