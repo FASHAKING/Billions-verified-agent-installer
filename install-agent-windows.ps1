@@ -216,8 +216,9 @@ Write-Info "Using Agent Name: $AgentName"
 Write-Info "Using Agent Description: $AgentDesc"
 Write-Host ""
 
-$ChallengeJson = "{`"name`":`"$AgentName`",`"description`":`"$AgentDesc`"}"
-node scripts/manualLinkHumanToAgent.js --challenge $ChallengeJson
+# Pass challenge JSON via env var to avoid PowerShell quoting issues with external commands
+$env:AGENT_CHALLENGE = ConvertTo-Json -Compress @{ name = $AgentName; description = $AgentDesc }
+node -e "const cp = require('child_process'); cp.execFileSync('node', ['scripts/manualLinkHumanToAgent.js', '--challenge', process.env.AGENT_CHALLENGE], {stdio: 'inherit'})"
 
 # ============================================================
 #  DONE
