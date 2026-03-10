@@ -1,22 +1,14 @@
 #!/usr/bin/env bash
 
 # ============================================================
-#  Verified Agent Identity — Installer for GitHub Codespaces
-#  & Workspaces (Ubuntu/Debian-based Linux environments)
+#  Verified Agent Identity — All-in-One Installer for macOS
 #  GitHub: https://github.com/FASHAKING/Billions-verified-agent-installer
 #
 #  Usage:
-#    curl -sL https://raw.githubusercontent.com/FASHAKING/Billions-verified-agent-installer/main/install-agent-codespaces.sh | bash
-#
-#  Supported environments:
-#    - GitHub Codespaces
-#    - GitHub Workspaces
-#    - Gitpod
-#    - Any Ubuntu/Debian-based Linux terminal
-#    - WSL (Windows Subsystem for Linux)
+#    curl -sL https://raw.githubusercontent.com/FASHAKING/Billions-verified-agent-installer/main/install-agent-macos.sh | bash
 #
 #  What this script does:
-#    1. Installs Node.js and Git if not already present
+#    1. Installs Homebrew (if not present), Node.js and Git
 #    2. Clones the verified-agent-identity repo
 #    3. Installs all dependencies (including common missing ones)
 #    4. Creates your Agent Ethereum Identity
@@ -38,10 +30,8 @@ print_banner() {
     echo ""
     echo -e "${CYAN}╔══════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║                                                          ║${NC}"
-    echo -e "${CYAN}║   ${BOLD}Verified Agent Identity — Codespaces Installer${NC}${CYAN}         ║${NC}"
+    echo -e "${CYAN}║   ${BOLD}Verified Agent Identity — macOS Installer${NC}${CYAN}              ║${NC}"
     echo -e "${CYAN}║   ${NC}by BillionsNetwork${CYAN}                                     ║${NC}"
-    echo -e "${CYAN}║                                                          ║${NC}"
-    echo -e "${CYAN}║   Works on: Codespaces | Workspaces | Gitpod | WSL      ║${NC}"
     echo -e "${CYAN}║                                                          ║${NC}"
     echo -e "${CYAN}╚══════════════════════════════════════════════════════════╝${NC}"
     echo ""
@@ -77,15 +67,12 @@ print_info() {
 
 print_banner
 
-# --- Detect environment ---
-if [ -n "$CODESPACES" ]; then
-    print_info "Detected: GitHub Codespaces"
-elif [ -n "$GITPOD_WORKSPACE_ID" ]; then
-    print_info "Detected: Gitpod"
-elif grep -qi microsoft /proc/version 2>/dev/null; then
-    print_info "Detected: WSL (Windows Subsystem for Linux)"
-else
-    print_info "Detected: Linux environment"
+# --- Check that we're on macOS ---
+if [ "$(uname)" != "Darwin" ]; then
+    print_error "This script is designed for macOS only."
+    print_info "For Linux/WSL, use: install-agent-codespaces.sh"
+    print_info "For Termux, use: install-agent.sh"
+    exit 1
 fi
 
 # --- Prompt user for agent details upfront ---
@@ -116,40 +103,39 @@ if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
 fi
 
 # ============================================================
-#  STEP 1: Install Node.js and Git
+#  STEP 1: Install Homebrew, Node.js, and Git
 # ============================================================
-print_step "1/5" "Checking and installing Node.js and Git"
+print_step "1/5" "Checking and installing prerequisites"
 
-# Determine if we can use sudo
-USE_SUDO=""
-if command -v sudo &>/dev/null; then
-    USE_SUDO="sudo"
+# --- Install Homebrew if not present ---
+if command -v brew &>/dev/null; then
+    print_success "Homebrew already installed."
+else
+    print_info "Homebrew not found. Installing..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/tty
+
+    # Add Homebrew to PATH for Apple Silicon Macs
+    if [ -f "/opt/homebrew/bin/brew" ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -f "/usr/local/bin/brew" ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+
+    if ! command -v brew &>/dev/null; then
+        print_error "Homebrew installation failed. Please install manually: https://brew.sh"
+        exit 1
+    fi
+    print_success "Homebrew installed."
 fi
 
 # --- Install Node.js if not present ---
 if command -v node &>/dev/null; then
     print_success "Node.js already installed: $(node -v)"
 else
-    print_info "Node.js not found. Installing..."
-
-    if command -v apt-get &>/dev/null; then
-        # Debian/Ubuntu — install via NodeSource
-        curl -fsSL https://deb.nodesource.com/setup_lts.x | $USE_SUDO bash -
-        $USE_SUDO apt-get install -y nodejs
-    elif command -v dnf &>/dev/null; then
-        $USE_SUDO dnf install -y nodejs npm
-    elif command -v yum &>/dev/null; then
-        curl -fsSL https://rpm.nodesource.com/setup_lts.x | $USE_SUDO bash -
-        $USE_SUDO yum install -y nodejs
-    elif command -v apk &>/dev/null; then
-        $USE_SUDO apk add --no-cache nodejs npm
-    else
-        print_error "Could not detect package manager. Please install Node.js manually: https://nodejs.org"
-        exit 1
-    fi
-
+    print_info "Node.js not found. Installing via Homebrew..."
+    brew install node
     if ! command -v node &>/dev/null; then
-        print_error "Node.js installation failed. Please install manually."
+        print_error "Node.js installation failed. Please install manually: https://nodejs.org"
         exit 1
     fi
     print_success "Node.js installed: $(node -v)"
@@ -159,21 +145,8 @@ fi
 if command -v git &>/dev/null; then
     print_success "Git already installed: $(git --version)"
 else
-    print_info "Git not found. Installing..."
-
-    if command -v apt-get &>/dev/null; then
-        $USE_SUDO apt-get update && $USE_SUDO apt-get install -y git
-    elif command -v dnf &>/dev/null; then
-        $USE_SUDO dnf install -y git
-    elif command -v yum &>/dev/null; then
-        $USE_SUDO yum install -y git
-    elif command -v apk &>/dev/null; then
-        $USE_SUDO apk add --no-cache git
-    else
-        print_error "Could not detect package manager. Please install Git manually."
-        exit 1
-    fi
-
+    print_info "Git not found. Installing via Homebrew..."
+    brew install git
     print_success "Git installed: $(git --version)"
 fi
 
@@ -204,7 +177,7 @@ print_success "Repository cloned successfully."
 print_info "Working directory: $(pwd)"
 
 # ============================================================
-#  STEP 3: Install Dependencies via clawhub
+#  STEP 3: Install Dependencies
 # ============================================================
 print_step "3/5" "Installing project dependencies"
 

@@ -26,6 +26,18 @@ irm https://raw.githubusercontent.com/FASHAKING/Billions-verified-agent-installe
 
 ---
 
+## macOS (Terminal)
+
+Open **Terminal** on your Mac and paste:
+
+```bash
+curl -sL https://raw.githubusercontent.com/FASHAKING/Billions-verified-agent-installer/main/install-agent-macos.sh | bash
+```
+
+> **Requirements:** macOS 10.15+. The script will auto-install Homebrew, Node.js, and Git if they are missing. Works on both Intel and Apple Silicon Macs.
+
+---
+
 ## GitHub Codespaces / Workspaces / Gitpod / WSL
 
 Open a terminal in your **Codespace**, **Workspace**, **Gitpod**, or **WSL** and paste:
@@ -44,7 +56,7 @@ Each installer follows the same steps:
 
 1. Installs **Node.js** and **Git** (if not already present)
 2. Clones the [verified-agent-identity](https://github.com/BillionsNetwork/verified-agent-identity) repository
-3. Installs all dependencies via `clawhub` (plus common missing modules)
+3. Installs all dependencies via `clawhub` (falls back to `npm install` if clawhub is unavailable)
 4. Creates your **Agent Ethereum Identity**
 5. Links your **Human Identity** with your Agent
 6. Gives you a **verification URL** to complete in your browser

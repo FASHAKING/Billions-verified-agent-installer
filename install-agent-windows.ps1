@@ -174,11 +174,20 @@ Write-Info "Working directory: $(Get-Location)"
 # ============================================================
 #  STEP 3: Install Dependencies via clawhub
 # ============================================================
-Write-Step "3/5" "Installing project dependencies via clawhub"
+Write-Step "3/5" "Installing project dependencies"
 
-npx --yes clawhub@latest install verified-agent-identity
-
-Write-Success "clawhub dependencies installed."
+# Try clawhub first, fall back to npm install if it fails
+Write-Info "Attempting to install via clawhub..."
+$ClawResult = $null
+try {
+    npx --yes clawhub@latest install verified-agent-identity 2>&1
+    if ($LASTEXITCODE -ne 0) { throw "clawhub failed" }
+    Write-Success "clawhub dependencies installed."
+} catch {
+    Write-Warn "clawhub failed. Falling back to npm install..."
+    npm install 2>&1
+    Write-Success "npm dependencies installed."
+}
 
 # --- Pre-install commonly missing modules ---
 Write-Info "Installing commonly required modules to prevent errors..."

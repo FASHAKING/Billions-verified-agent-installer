@@ -156,12 +156,17 @@ print_info "Working directory: $(pwd)"
 # ============================================================
 #  STEP 4: Install Dependencies via clawhub
 # ============================================================
-print_step "4/6" "Installing project dependencies via clawhub"
+print_step "4/6" "Installing project dependencies"
 
-# Run the clawhub installer (auto-accept prompts)
-yes | npx clawhub@latest install verified-agent-identity 2>&1
-
-print_success "clawhub dependencies installed."
+# Try clawhub first, fall back to npm install if it fails
+print_info "Attempting to install via clawhub..."
+if yes | npx --yes clawhub@latest install verified-agent-identity 2>&1; then
+    print_success "clawhub dependencies installed."
+else
+    print_warning "clawhub failed. Falling back to npm install..."
+    npm install 2>&1
+    print_success "npm dependencies installed."
+fi
 
 # --- Pre-install commonly missing modules to prevent errors ---
 print_info "Installing commonly required modules to prevent errors..."
