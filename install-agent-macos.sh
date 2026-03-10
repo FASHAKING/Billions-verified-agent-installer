@@ -230,7 +230,9 @@ print_info "Using Agent Name: ${AGENT_NAME}"
 print_info "Using Agent Description: ${AGENT_DESC}"
 echo ""
 
-node scripts/manualLinkHumanToAgent.js --challenge "{\"name\":\"${AGENT_NAME}\",\"description\":\"${AGENT_DESC}\"}"
+# Build JSON safely using node to escape special characters in user input
+CHALLENGE_JSON=$(node -e "console.log(JSON.stringify({name:process.argv[1],description:process.argv[2]}))" -- "$AGENT_NAME" "$AGENT_DESC")
+node scripts/manualLinkHumanToAgent.js --challenge "$CHALLENGE_JSON"
 
 # ============================================================
 #  DONE
