@@ -160,9 +160,21 @@ print_step "4/6" "Installing project dependencies via clawhub"
 
 # Run the clawhub installer (--force needed for non-interactive mode
 # since VirusTotal Code Insight flags the skill as suspicious)
-yes | npx clawhub@latest install verified-agent-identity --force 2>&1
+# Falls back to npm install if clawhub fails (e.g., "Skill not found" error)
+if yes | npx clawhub@latest install verified-agent-identity --force 2>&1; then
+    print_success "clawhub dependencies installed."
+else
+    print_warning "clawhub failed — falling back to npm install..."
 
-print_success "clawhub dependencies installed."
+    # Ensure package.json exists for npm install
+    if [ ! -f "package.json" ]; then
+        print_info "Creating package.json..."
+        npm init -y 2>&1
+    fi
+
+    npm install 2>&1
+    print_success "npm dependencies installed (fallback)."
+fi
 
 # --- Pre-install commonly missing modules to prevent errors ---
 print_info "Installing commonly required modules to prevent errors..."
